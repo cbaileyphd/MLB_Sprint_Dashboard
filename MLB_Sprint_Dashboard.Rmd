@@ -1,0 +1,438 @@
+---
+title: "2021 MLB Sprint Performance Normative Values"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    theme: 
+      version: 4
+      bg: "#2C82B5"
+      fg: "#101010"
+      primary: "#682C37"
+      navbar-bg: "#2C82B5" #blue
+      base_font:
+        google: Space Grotesk
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(plotly)
+sprints <- read.csv("running_splits 2021 min 10.csv")
+
+df <- sprints %>% 
+   mutate(t30 = seconds_since_hit_030) %>% 
+   mutate(t60 = seconds_since_hit_060-seconds_since_hit_030) %>% 
+   mutate(t90 = seconds_since_hit_090-seconds_since_hit_060) %>% 
+   mutate(total90 = seconds_since_hit_090)
+
+#getting percentiles
+dfx <- as.data.frame(apply(df[28:31] , 2 , quantile , probs = seq(0,1,0.05) , na.rm = TRUE ))
+dfx$Percentile <- row.names(dfx)
+dfx$Percentile<-as.numeric(gsub("\\%","",dfx$Percentile))
+dfx$Percentile <- 100-dfx$Percentile
+rownames(dfx)<-NULL
+dfx<-round(dfx,2)
+colnames(dfx) <- c("Time 0 to 30 ft", "Time 30 to 60 ft", " Time 60 to 90 ft", "Total Time (0 to 90 ft)", "Percentile")
+#plot fxn
+time_percentileplotter <- function(x){
+ggplot(dfx, aes(Percentile,x)) +
+  geom_point() +geom_smooth(color='#2C82B5') + theme_minimal() 
+}
+```
+
+# All Positions 
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+
+### Total time 0 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$`Total Time (0 to 90 ft)`) + labs(y="Total Time (0 to 90 ft)")
+ggplotly(p)
+```
+
+### Time 0 to 30 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 0 to 30 ft`) + labs(y="Time 0 to 30 ft")
+ggplotly(p)
+```
+
+### Time 30 to 60 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 30 to 60 ft`) + labs(y="Time 30 to 60 ft")
+ggplotly(p)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$` Time 60 to 90 ft`) + labs(y="Time 60 to 90 ft")
+ggplotly(p)
+```
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Total time 0 to 90 ft
+
+```{r}
+dfz <- dfx %>% 
+  select(`Total Time (0 to 90 ft)`,Percentile)
+knitr::kable(dfz)
+```
+
+### Time 0 to 30 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 0 to 30 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+
+### Time 30 to 60 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 30 to 60 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(` Time 60 to 90 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+# Outfielders
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+```{r}
+dfx <- df %>% 
+  filter(position_name == "RF" | position_name == "CF" | position_name == "LF" )
+
+dfx <- as.data.frame(apply(dfx[28:31] , 2 , quantile , probs = seq(0,1,0.05) , na.rm = TRUE ))
+dfx$Percentile <- row.names(dfx)
+dfx$Percentile<-as.numeric(gsub("\\%","",dfx$Percentile))
+dfx$Percentile <- 100-dfx$Percentile
+rownames(dfx)<-NULL
+dfx<-round(dfx,2)
+colnames(dfx) <- c("Time 0 to 30 ft", "Time 30 to 60 ft", " Time 60 to 90 ft", "Total Time (0 to 90 ft)", "Percentile")
+```
+
+### Total time 0 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$`Total Time (0 to 90 ft)`) + labs(y="Total Time (0 to 90 ft)")
+ggplotly(p)
+```
+
+### Time 0 to 30 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 0 to 30 ft`) + labs(y="Time 0 to 30 ft")
+ggplotly(p)
+```
+
+### Time 30 to 60 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 30 to 60 ft`) + labs(y="Time 30 to 60 ft")
+ggplotly(p)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$` Time 60 to 90 ft`) + labs(y="Time 60 to 90 ft")
+ggplotly(p)
+```
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Total time 0 to 90 ft
+
+```{r}
+dfz <- dfx %>% 
+  select(`Total Time (0 to 90 ft)`,Percentile)
+knitr::kable(dfz)
+```
+
+### Time 0 to 30 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 0 to 30 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+
+### Time 30 to 60 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 30 to 60 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(` Time 60 to 90 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+
+# Middle Infielders
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+```{r}
+dfx <- df %>% 
+  filter(position_name == "SS" | position_name == "2B" )
+
+dfx <- as.data.frame(apply(dfx[28:31] , 2 , quantile , probs = seq(0,1,0.05) , na.rm = TRUE ))
+dfx$Percentile <- row.names(dfx)
+dfx$Percentile<-as.numeric(gsub("\\%","",dfx$Percentile))
+dfx$Percentile <- 100-dfx$Percentile
+rownames(dfx)<-NULL
+dfx<-round(dfx,2)
+colnames(dfx) <- c("Time 0 to 30 ft", "Time 30 to 60 ft", " Time 60 to 90 ft", "Total Time (0 to 90 ft)", "Percentile")
+```
+
+### Total time 0 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$`Total Time (0 to 90 ft)`) + labs(y="Total Time (0 to 90 ft)")
+ggplotly(p)
+```
+
+### Time 0 to 30 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 0 to 30 ft`) + labs(y="Time 0 to 30 ft")
+ggplotly(p)
+```
+
+### Time 30 to 60 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 30 to 60 ft`) + labs(y="Time 30 to 60 ft")
+ggplotly(p)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$` Time 60 to 90 ft`) + labs(y="Time 60 to 90 ft")
+ggplotly(p)
+```
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Total time 0 to 90 ft
+
+```{r}
+dfz <- dfx %>% 
+  select(`Total Time (0 to 90 ft)`,Percentile)
+knitr::kable(dfz)
+```
+
+### Time 0 to 30 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 0 to 30 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+
+### Time 30 to 60 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 30 to 60 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(` Time 60 to 90 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+
+# Corner Infielders
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+```{r}
+dfx <- df %>% 
+  filter(position_name == "1B" | position_name == "3B")
+
+dfx <- as.data.frame(apply(dfx[28:31] , 2 , quantile , probs = seq(0,1,0.05) , na.rm = TRUE ))
+dfx$Percentile <- row.names(dfx)
+dfx$Percentile<-as.numeric(gsub("\\%","",dfx$Percentile))
+dfx$Percentile <- 100-dfx$Percentile
+rownames(dfx)<-NULL
+dfx<-round(dfx,2)
+colnames(dfx) <- c("Time 0 to 30 ft", "Time 30 to 60 ft", " Time 60 to 90 ft", "Total Time (0 to 90 ft)", "Percentile")
+```
+
+### Total time 0 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$`Total Time (0 to 90 ft)`) + labs(y="Total Time (0 to 90 ft)")
+ggplotly(p)
+```
+
+### Time 0 to 30 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 0 to 30 ft`) + labs(y="Time 0 to 30 ft")
+ggplotly(p)
+```
+
+### Time 30 to 60 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 30 to 60 ft`) + labs(y="Time 30 to 60 ft")
+ggplotly(p)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$` Time 60 to 90 ft`) + labs(y="Time 60 to 90 ft")
+ggplotly(p)
+```
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Total time 0 to 90 ft
+
+```{r}
+dfz <- dfx %>% 
+  select(`Total Time (0 to 90 ft)`,Percentile)
+knitr::kable(dfz)
+```
+
+### Time 0 to 30 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 0 to 30 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+
+### Time 30 to 60 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 30 to 60 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(` Time 60 to 90 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+
+# Catchers
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+```{r}
+dfx <- df %>% 
+  filter(position_name == "C")
+
+dfx <- as.data.frame(apply(dfx[28:31] , 2 , quantile , probs = seq(0,1,0.05) , na.rm = TRUE ))
+dfx$Percentile <- row.names(dfx)
+dfx$Percentile<-as.numeric(gsub("\\%","",dfx$Percentile))
+dfx$Percentile <- 100-dfx$Percentile
+rownames(dfx)<-NULL
+dfx<-round(dfx,2)
+colnames(dfx) <- c("Time 0 to 30 ft", "Time 30 to 60 ft", " Time 60 to 90 ft", "Total Time (0 to 90 ft)", "Percentile")
+```
+
+### Total time 0 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$`Total Time (0 to 90 ft)`) + labs(y="Total Time (0 to 90 ft)")
+ggplotly(p)
+```
+
+### Time 0 to 30 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 0 to 30 ft`) + labs(y="Time 0 to 30 ft")
+ggplotly(p)
+```
+
+### Time 30 to 60 ft
+```{r}
+p <- time_percentileplotter(dfx$`Time 30 to 60 ft`) + labs(y="Time 30 to 60 ft")
+ggplotly(p)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+p <- time_percentileplotter(dfx$` Time 60 to 90 ft`) + labs(y="Time 60 to 90 ft")
+ggplotly(p)
+```
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Total time 0 to 90 ft
+
+```{r}
+dfz <- dfx %>% 
+  select(`Total Time (0 to 90 ft)`,Percentile)
+knitr::kable(dfz)
+```
+
+### Time 0 to 30 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 0 to 30 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+
+### Time 30 to 60 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(`Time 30 to 60 ft`, Percentile)
+knitr::kable(dfz)
+```
+
+### Time 60 to 90 ft
+
+```{r}
+dfz<- dfx %>% 
+  select(` Time 60 to 90 ft`, Percentile)
+knitr::kable(dfz)
+```
+
